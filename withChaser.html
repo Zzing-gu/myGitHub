@@ -2,35 +2,40 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<title>완성</title>
+	<title>just for fun</title>
 </head>
 <body>
 <button id="getTan">getTan()</button>
 <canvas id="myCanvas" width="800px" height="800px" ></canvas>
 <script>
-	//기본 캔버스 셋팅
+	//canvas context
 	var canvas = document.querySelector("#myCanvas");
 	var context = canvas.getContext("2d");
-	//배경
+	// if you want background uncomment these
 	//var bg = new Image();
 	//bg.src ="images/bg_uni.jpg";
 	var amebaList =[];
-	//음식관련
+	// the location of the food that small abema chasing
 	var foodLocX = Math.floor(Math.random()*800);
 	var foodLocY = Math.floor(Math.random()*800);
 	var count = 0;
 
 	var chaserList = [];
 
+
+	//ingnore this , it's  for future need
 	document.querySelector("#getTan").addEventListener("click",function(){
 
 	});
 
+
+	// make new food at the point where u clicked
 	document.querySelectorAll("body")[0].addEventListener("click",function(e){
 		var x = e.offsetX;
 		var y = e.offsetY;
 		foodMaker(x,y);
 	})
+
 
 	var ameba = function(){
 		var locateX =400;
@@ -45,8 +50,8 @@
 		var YdivX = (disY/disX);
 		var angle = Math.atan(YdivX)* 180 / Math.PI;
 		var movement = 1;
-		console.log("절대 거리 " + offset);
-		console.log(" 각도 "+ angle);
+		console.log("abs distance " + offset);
+		console.log(" angle "+ angle);
 
 		var obj = {
 			x:locateX,
@@ -80,8 +85,8 @@
 		var YdivX = (disY/disX);
 		var angle = Math.atan(YdivX)* 180 / Math.PI;
 		var movement = 1;
-		console.log("절대 거리 " + offset);
-		console.log(" 각도 "+ angle);
+		console.log("abs distance " + offset);
+		console.log(" angle "+ angle);
 
 		var obj = {
 			x:chaserLocateX,
@@ -102,12 +107,12 @@
 
 	chaser();
 
-		var foodMaker = function(x,y){   // 자바 스크립트에서 오버 로딩하는 방법
-		//클릭하였을떄
+		var foodMaker = function(x,y){   // how to overloading in javascript
+		// when body has been clicked
 		if(x!=undefined){
 			foodLocX = x;
 			foodLocY = y;
-		//클릭안할때
+		//when it's not
 		}else{
 			foodLocX = Math.random()*800;
 			foodLocY = Math.random()*800;
@@ -115,15 +120,15 @@
 		context.beginPath();
 		context.arc(foodLocX ,foodLocY,5,0,2*Math.PI);
 		context.stroke();
-		// 새로운 위치에 대한 새로운 절대거리나 각도 갱신
+		//  updating angle, abs distance stuff for new food location
 		for(i=0 ; i<amebaList.length ; i++){
 			var tmp = amebaList[i]
 			 var disX = Math.abs(foodLocX-tmp.x);
 			 var disY = Math.abs(foodLocY-tmp.y);
 			 var offset = Math.round(Math.sqrt(Math.pow(disX,2) + Math.pow(disY,2)));
 			 var angle = Math.round(Math.atan(disY/disX)* 180 / Math.PI);
-			 console.log("거리"+offset);
-			 console.log("탄젠트 각도"+angle);
+			 console.log("abs distance"+offset);
+			 console.log("angle"+angle);
 			 tmp.offset = offset;
 			 tmp.angle = angle;
 			 tmp.disX = disX;
@@ -134,15 +139,15 @@
 	};
 
 	var chaserSensor = function(){
-		// 새로운 위치에 대한 새로운 절대거리나 각도 갱신
+		// updating angle, abs distance stuff for new food location - as predator
 		for(i=0 ; i<chaserList.length ; i++){
 			var tmp = chaserList[i]
 			 var disX = Math.abs(amebaList[0].x-tmp.x);
 			 var disY = Math.abs(amebaList[0].y-tmp.y);
 			 var offset = Math.round(Math.sqrt(Math.pow(disX,2) + Math.pow(disY,2)));
 			 var angle = Math.round(Math.atan(disY/disX)* 180 / Math.PI);
-			 console.log("거리"+offset);
-			 console.log("탄젠트 각도"+angle);
+			 console.log("abs distance"+offset);
+			 console.log("angle"+angle);
 			 tmp.offset = offset;
 			 tmp.angle = angle;
 			 tmp.disX = disX;
@@ -153,7 +158,7 @@
 	var chaseFood = function(){
 		for(i=0 ; i<amebaList.length ; i++){
 			var tmp = amebaList[i]
-			// x 움직임
+			// x movement
 			if(tmp.x < foodLocX){
 					count++;
 					tmp.x = tmp.x+tmp.disX/tmp.offset;
@@ -175,7 +180,7 @@
 	var chaseAmeba = function(){
 		for(i=0 ; i<chaserList.length ; i++){
 			var tmp = chaserList[i]
-			// x 움직임
+			// x movement
 			if(tmp.x < amebaList[0].x){
 					count++;
 					tmp.x = tmp.x+tmp.disX/(tmp.offset*2);
@@ -201,8 +206,8 @@
 			var XX=Math.abs(tmp.x-foodLocX);
 			var YY=Math.abs(tmp.y-foodLocY);
 			if(XX<5 && YY <5){
-				console.log("걸린 시간"+count);
-				console.log("속도 "+ tmp.offset/count);
+				console.log("time taken"+count);
+				console.log("velocity "+ tmp.offset/count);
 				//reset time
 				count = 0;
 				//make food at new loc
