@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>완성</title>
+</head>
+<body>
+<button id="getTan">getTan()</button>
+<canvas id="myCanvas" width="800px" height="800px" ></canvas>
+<script>
+	//기본 캔버스 셋팅
+	var canvas = document.querySelector("#myCanvas");
+	var context = canvas.getContext("2d");
+	//배경
+	//var bg = new Image();
+	//bg.src ="images/bg_uni.jpg";
+	var amebaList =[];
+	//음식관련
+	var foodLocX = Math.floor(Math.random()*800);
+	var foodLocY = Math.floor(Math.random()*800);
+	var count = 0;
+
+	var chaserList = [];
+
+	document.querySelector("#getTan").addEventListener("click",function(){
+
+	});
+
+	document.querySelectorAll("body")[0].addEventListener("click",function(e){
+		var x = e.offsetX;
+		var y = e.offsetY;
+		foodMaker(x,y);
+	})
+
+	var ameba = function(){
+		var locateX =400;
+		var locateY =400;
+		var xV = 5;
+		var yV = 5;
+		var color = "#"+(Math.round(Math.random()*16777215)).toString(16);
+		var life = 10;
+		var disX = Math.abs(foodLocX-locateX);
+		var disY = Math.abs(foodLocY-locateY);
+		var offset = Math.round(Math.sqrt(Math.pow(disX,2) + Math.pow(disY,2)));
+		var YdivX = (disY/disX);
+		var angle = Math.atan(YdivX)* 180 / Math.PI;
+		var movement = 1;
+		console.log("절대 거리 " + offset);
+		console.log(" 각도 "+ angle);
+
+		var obj = {
+			x:locateX,
+			y:locateY,
+			color:color,
+			xV:xV,
+			yV:yV,
+			life:life,
+			angle:angle,
+			offset:offset,
+			movement:movement,
+			disX:disX,
+			disY:disY
+
+		};
+		amebaList.push(obj);
+	}
+
+	ameba();
+
+	var chaser = function(){
+		var chaserLocateX =800;
+		var chaserLocateY =800;
+		var xV = 5;
+		var yV = 5;
+		var color = "#"+(Math.round(Math.random()*16777215)).toString(16);
+		var life = 10;
+		var disX = Math.abs(foodLocX-chaserLocateX);
+		var disY = Math.abs(foodLocY-chaserLocateY);
+		var offset = Math.round(Math.sqrt(Math.pow(disX,2) + Math.pow(disY,2)));
+		var YdivX = (disY/disX);
+		var angle = Math.atan(YdivX)* 180 / Math.PI;
+		var movement = 1;
+		console.log("절대 거리 " + offset);
+		console.log(" 각도 "+ angle);
+
+		var obj = {
+			x:chaserLocateX,
+			y:chaserLocateY,
+			color:color,
+			xV:xV,
+			yV:yV,
+			life:life,
+			angle:angle,
+			offset:offset,
+			movement:movement,
+			disX:disX,
+			disY:disY
+
+		};
+		chaserList.push(obj);
+	}
+
+	chaser();
+
+		var foodMaker = function(x,y){   // 자바 스크립트에서 오버 로딩하는 방법
+		//클릭하였을떄
+		if(x!=undefined){
+			foodLocX = x;
+			foodLocY = y;
+		//클릭안할때
+		}else{
+			foodLocX = Math.random()*800;
+			foodLocY = Math.random()*800;
+		}
+		context.beginPath();
+		context.arc(foodLocX ,foodLocY,5,0,2*Math.PI);
+		context.stroke();
+		// 새로운 위치에 대한 새로운 절대거리나 각도 갱신
+		for(i=0 ; i<amebaList.length ; i++){
+			var tmp = amebaList[i]
+			 var disX = Math.abs(foodLocX-tmp.x);
+			 var disY = Math.abs(foodLocY-tmp.y);
+			 var offset = Math.round(Math.sqrt(Math.pow(disX,2) + Math.pow(disY,2)));
+			 var angle = Math.round(Math.atan(disY/disX)* 180 / Math.PI);
+			 console.log("거리"+offset);
+			 console.log("탄젠트 각도"+angle);
+			 tmp.offset = offset;
+			 tmp.angle = angle;
+			 tmp.disX = disX;
+			 tmp.disY = disY;
+			}
+
+
+	};
+
+	var chaserSensor = function(){
+		// 새로운 위치에 대한 새로운 절대거리나 각도 갱신
+		for(i=0 ; i<chaserList.length ; i++){
+			var tmp = chaserList[i]
+			 var disX = Math.abs(amebaList[0].x-tmp.x);
+			 var disY = Math.abs(amebaList[0].y-tmp.y);
+			 var offset = Math.round(Math.sqrt(Math.pow(disX,2) + Math.pow(disY,2)));
+			 var angle = Math.round(Math.atan(disY/disX)* 180 / Math.PI);
+			 console.log("거리"+offset);
+			 console.log("탄젠트 각도"+angle);
+			 tmp.offset = offset;
+			 tmp.angle = angle;
+			 tmp.disX = disX;
+			 tmp.disY = disY;
+			}
+	};
+
+	var chaseFood = function(){
+		for(i=0 ; i<amebaList.length ; i++){
+			var tmp = amebaList[i]
+			// x 움직임
+			if(tmp.x < foodLocX){
+					count++;
+					tmp.x = tmp.x+tmp.disX/tmp.offset;
+			}else{
+					count++;
+					tmp.x = tmp.x-tmp.disX/tmp.offset;
+			}
+			// y movement
+			if(tmp.y < foodLocY){
+					count++;
+					tmp.y = tmp.y+tmp.disY/tmp.offset;
+			}else{
+					count++;
+					tmp.y = tmp.y-tmp.disY/tmp.offset;
+			}
+		};
+	};
+
+	var chaseAmeba = function(){
+		for(i=0 ; i<chaserList.length ; i++){
+			var tmp = chaserList[i]
+			// x 움직임
+			if(tmp.x < amebaList[0].x){
+					count++;
+					tmp.x = tmp.x+tmp.disX/(tmp.offset*2);
+			}else{
+					count++;
+					tmp.x = tmp.x-tmp.disX/(tmp.offset*2);
+			}
+			// y movement
+			if(tmp.y < amebaList[0].y){
+					count++;
+					tmp.y = tmp.y+tmp.disY/(tmp.offset*2);
+			}else{
+					count++;
+					tmp.y = tmp.y-tmp.disY/(tmp.offset*2);
+			}
+		};
+	};
+
+
+	var eatFood = function(){
+		for (var i = 0; i < amebaList.length; i++) {
+			var tmp = amebaList[i];
+			var XX=Math.abs(tmp.x-foodLocX);
+			var YY=Math.abs(tmp.y-foodLocY);
+			if(XX<5 && YY <5){
+				console.log("걸린 시간"+count);
+				console.log("속도 "+ tmp.offset/count);
+				//reset time
+				count = 0;
+				//make food at new loc
+				foodMaker();
+			}
+		}
+	};
+	var theRuleOftheNature = function(){
+		//drawing - bakcground
+		//context.drawImage(bg,0,0,800,800);
+		//drawing - food
+		context.beginPath();
+		context.arc(foodLocX ,foodLocY,5,0,2*Math.PI);
+		context.stroke();
+		//add-ons
+		eatFood();
+		chaseFood();
+
+		//predator
+		chaserSensor();
+		chaseAmeba();
+		//drawing - ameba
+		for (var i = 0; i < amebaList.length; i++) {
+			var tmp = amebaList[i];
+			context.strokeStyle = tmp.color;
+			context.beginPath();
+			context.arc(tmp.x,tmp.y,10,0,2*Math.PI);
+			context.stroke();
+		}
+		for (var i = 0; i < chaserList.length; i++) {
+			var tmp = chaserList[i];
+			context.strokeStyle = tmp.color;
+			context.beginPath();
+			context.arc(tmp.x,tmp.y,20,0,2*Math.PI);
+			context.stroke();
+		}
+	};
+
+	setInterval(theRuleOftheNature,10);
+
+</script>
+</body>
+</html>
